@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -15,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helenapopova.mythirdapplication.BuildConfig;
 import com.example.helenapopova.mythirdapplication.R;
 import com.example.helenapopova.mythirdapplication.box.BoxAdapter;
 import com.example.helenapopova.mythirdapplication.box.Mode;
@@ -28,7 +31,6 @@ import java.util.Map;
 import lombok.Data;
 
 public class Settings extends Fragment {
-    private static String[] operationsMode = new String[Info.getSize()];
     private Context context;
     private View fragmentSettings;
     ArrayList<Mode> settings = new ArrayList<>();
@@ -37,12 +39,13 @@ public class Settings extends Fragment {
     Button reset;
     LayoutInflater inflaterSett;
     public static final String APP_PREFERENCES = "mysettings";
+    private final String TAG = "settingsFragment";
     private  SharedPreferences sp;
     @Override
     public void onAttach(Context _context) {
         this.context = _context;
-        super.onAttach(_context);
         sp = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        super.onAttach(_context);
     }
 
     @Override
@@ -65,6 +68,7 @@ public class Settings extends Fragment {
         });
     }
 
+
     /**
      * Задание списка настроек
      */
@@ -79,7 +83,6 @@ public class Settings extends Fragment {
 
     @Override
     public void onPause() {
-        outputTost(String.valueOf(boxAdapter.getCount()));
         super.onPause();
     }
 
@@ -88,13 +91,19 @@ public class Settings extends Fragment {
         int i;
         settings.clear();
         for (i = 0; i < Info.getSize(); i++) {
-            operationsMode[i] = String.valueOf(Info.getOperationsMode()[i]);
-           settings.add(new Mode(Info.getTitlesMode()[i], operationsMode[i], Info.getHints()[i]));
+            String operation = String.valueOf(Info.getOperationsMode()[i]);
+           settings.add(new Mode(Info.getTitlesMode()[i], operation, Info.getHints()[i]));
         }
     }
 
     public void outputTost(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void outputLogs(String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message);
+        }
     }
 
 }

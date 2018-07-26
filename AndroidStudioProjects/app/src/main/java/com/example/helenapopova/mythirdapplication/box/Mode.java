@@ -1,8 +1,11 @@
 package com.example.helenapopova.mythirdapplication.box;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+
 public class Mode {
     private String title;
     private String value;
@@ -12,5 +15,17 @@ public class Mode {
         this.title = title;
         this.value = value;
         this.hint = hint;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String getHint() {
+        return hint;
     }
 }

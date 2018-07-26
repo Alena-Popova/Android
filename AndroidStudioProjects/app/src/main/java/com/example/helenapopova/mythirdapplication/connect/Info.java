@@ -15,7 +15,6 @@ public class Info {
             "mode The ratio 1T: ",
             "mode The ratio 2T: ",
             "mode Course: " ,
-            "Incoming bytes: ",
             "Data query operation: "};
     private static char[] operationsMode = {
             '@',
@@ -25,7 +24,6 @@ public class Info {
             'D',
             'E',
             'F',
-            'C',
             '1'};
     private static String[] hints = {
             "(default 0x40)",
@@ -35,7 +33,6 @@ public class Info {
             "(default 0x44)",
             "(default 0x45)",
             "(default 0x46)",
-            "(default 12)",
             "(default '1')"};
     //____________________________________
 
@@ -68,6 +65,10 @@ public class Info {
         return operationsMode[6];
     }
 
+    public static String getTitleDataQuery() {
+        return titlesMode[7];
+    }
+
     public static String getModeStringItem(int item) {
         int operation = item - 24;
         String result;
@@ -94,7 +95,7 @@ public class Info {
                 result = "mode Course - 0x" + operation;
                 break;
             default:
-                result = "error #1";
+                result = "operation - 0x" + operation;
                 break;
         }
         return result;

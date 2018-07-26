@@ -4,29 +4,38 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helenapopova.mythirdapplication.BuildConfig;
 import com.example.helenapopova.mythirdapplication.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class BoxAdapter extends BaseAdapter {
     private Context context;
-    @Getter
-    ArrayList<Mode> settings;
-    LayoutInflater layoutInflater;
-    public static final String APP_PREFERENCES = "mysettings";
+    private ArrayList<Mode> settings;
+    private LayoutInflater layoutInflater;
+    private static final String APP_PREFERENCES = "mysettings";
     private final SharedPreferences sp;
     private final SharedPreferences.Editor editor;
-    String contextText;
+    private int contextText;
+    Map<String, String> tagAndValue = new HashMap<>();
+    private final String TAG = "settingsBoring";
 
     public BoxAdapter(Context _contex, ArrayList<Mode> _modes) {
         this.context = _contex;
@@ -49,7 +58,7 @@ public class BoxAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return 0;
     }
 
     @Override
@@ -59,27 +68,24 @@ public class BoxAdapter extends BaseAdapter {
             view = layoutInflater.inflate(R.layout.item_mode, parent, false);
         }
         final Mode p = this.settings.get(position);
+        outputLogs(String.valueOf(position));
+        CheckBox checkBox = view.findViewById(R.id.checkSave);
 
         ((TextView) view.findViewById(R.id.mode_title)).setText(p.getTitle());
         final EditText editText = view.findViewById(R.id.custum_mode_data);
         editText.setHint(p.getHint());
         if (sp.contains(p.getTitle())) {
-            contextText = sp.getString(p.getTitle(), String.valueOf('\u0000'));
-            editText.setText(contextText);
+            contextText = sp.getInt(p.getTitle(), 1);
+            editText.setText(String.valueOf(contextText));
         }
-        editText.addTextChangedListener(new TextWatcher() {
+        checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(editText.getText().toString().length() != 0 && !editText.getText().toString().equals(String.valueOf('\u0000'))) {
-                   editor.putString(p.getTitle(), editText.getText().toString()).apply();
+            public void onClick(View v) {
+                String textSave = editText.getText().toString();
+                if(textSave.length() != 0 && !textSave.equals(contextText)) {
+                    editor.putInt(p.getTitle(), Integer.parseInt(textSave)).apply();
+                } else if (textSave.length() == 0  && sp.contains(p.getTitle())) {
+                    editor.remove(p.getTitle()).apply();
                 }
             }
         });
@@ -89,4 +95,12 @@ public class BoxAdapter extends BaseAdapter {
     public void outputTost(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
+
+    public void outputLogs(String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message);
+        }
+    }
+
+
 }

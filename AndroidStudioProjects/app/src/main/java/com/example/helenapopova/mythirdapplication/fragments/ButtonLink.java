@@ -1,5 +1,8 @@
 package com.example.helenapopova.mythirdapplication.fragments;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
@@ -30,9 +33,16 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     View inflatedView;
     TextView temperature;
     TextView acceptStr;
+    SharedPreferences sp;
     @Getter
-    private byte bufferFTDI[] = new byte[14];
+    private byte bufferFTDI[] = new byte[254];
+    public static final String APP_PREFERENCES = "mysettings";
 
+    @Override
+    public void onAttach(Context context) {
+        sp = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        super.onAttach(context);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,25 +87,25 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        menu.add(0, Info.getNodeFirst(), 1, "Работа - 0х40");
-        menu.add(0, Info.getNodeSecond(), 2, "Усиление - 0х41");
-        menu.add(0, Info.getNodeThird(), 3, "Линейность - 0х42");
-        menu.add(0, Info.getNodeForth(), 4, "Смещение - 0х43");
-        menu.add(0, Info.getNodeFifth(), 5, "Отношение 1Т - 0х44");
-        menu.add(0, Info.getNodeSixth(), 6, "Отношение 2Т - 0х45");
-        menu.add(0, Info.getNodeSeventh(), 7, "Курс - 0х46");
+        String change;
+
+        for (int i = 0; i < 7; i++) {
+            char id = Info.getOperationsMode()[i];
+            if (sp.contains(Info.getTitlesMode()[i])) {
+                id = (char) (sp.getInt(Info.getTitlesMode()[i],i + 40) + 24);
+            }
+            int code = Integer.valueOf(id) - 24;
+            menu.add(0, id, i + 1, Info.getTitlesMode()[i] + "0x" + code);
+        }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        boolean result = false;
         TextView textView = inflatedView.findViewById(R.id.mode_data);
-        if (item.getItemId() > 63 && item.getItemId() < 71) {
-            onClickSend(Character.toString((char) item.getItemId()));
-            textView.setText(Info.getModeStringItem(item.getItemId()));
-            result = true;
-        }
-        return result;
+        onClickSend(Character.toString((char) item.getItemId()));
+        int code = item.getItemId() - 24;
+        textView.setText(Info.getTitlesMode()[item.getOrder()] + "0x" + code);
+        return true;
     }
 
     public void onClickStart() {
@@ -108,6 +118,11 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         buttonSelect.setEnabled(true);
     }
 
+    @Override
+    public void onPause() {
+        onClickStop();
+        super.onPause();
+    }
 
     public boolean onClickSend(String operation) {
         boolean result = false;
@@ -159,7 +174,8 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     public void sendMessageAndGetAnswer() {
         try {
             byte[] mask = new byte[1];
-            mask[0] = (byte) "1".charAt(0);
+            int offer = sp.getInt(Info.getTitleDataQuery(), 1);
+            mask[0] = (byte) String.valueOf(offer).charAt(0);
             connectorFTDI.writeFTDI(mask, 1000);
             acceptStr.setText(getBufferToStr());
         } catch (IOException io) {
@@ -177,9 +193,9 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
             outputTost("io init");
         }
         for (int i = 0; i < answer; i++) {
-            result.append(String.format("%02X",bufferFTDI[i])).append(" ");
+            result.append(String.format("%02X", bufferFTDI[i])).append(" ");
         }
-        bufferFTDI = new byte[14];
+        bufferFTDI = new byte[254];
         return result.toString();
     }
 

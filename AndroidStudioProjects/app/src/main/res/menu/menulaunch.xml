@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".LaunchActivity">
+
+    <item
+        android:id="@+id/show_tempereture"
+        android:icon="@drawable/temperature"
+        android:orderInCategory="1"
+        android:title="@string/item_menu_temperature"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/set_settings"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:orderInCategory="2"
+        android:title="@string/settings"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/support_service"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@android:drawable/sym_action_email"
+        android:orderInCategory="3"
+        android:title="@string/item_menu_support"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/update"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:orderInCategory="4"
+        android:title="@string/item_menu_update"
+        app:showAsAction="always" />
+</menu>

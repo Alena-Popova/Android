@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-sw720dp-land-v13\\values-sw720dp-land-v13.xml",
+            "outputFile": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-sw720dp-land-v13\\values-sw720dp-land-v13.xml",
             "map": [
                 {
-                    "source": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values-sw720dp-land\\dimens.xml",
+                    "source": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values-sw720dp-land\\dimens.xml",
                     "from": {
                         "startLines": "6",
                         "startColumns": "4",

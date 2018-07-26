@@ -1,10 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
-                    "source": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\styles.xml",
+                    "source": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\dimens.xml",
+                    "from": {
+                        "startLines": "3,4",
+                        "startColumns": "4,4",
+                        "startOffsets": "89,147",
+                        "endColumns": "57,55",
+                        "endOffsets": "142,198"
+                    },
+                    "to": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,113",
+                        "endColumns": "57,55",
+                        "endOffsets": "108,164"
+                    }
+                },
+                {
+                    "source": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "6,15",
                         "startColumns": "4,4",
@@ -23,7 +40,7 @@
                     }
                 },
                 {
-                    "source": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\strings.xml",
+                    "source": "D:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "4,3",
                         "startColumns": "4,4",
@@ -37,23 +54,6 @@
                         "startOffsets": "169,222",
                         "endColumns": "52,53",
                         "endOffsets": "217,271"
-                    }
-                },
-                {
-                    "source": "D:\\AndroidStudioProjects\\fTDI_UART_Sample\\src\\main\\res\\values\\dimens.xml",
-                    "from": {
-                        "startLines": "3,4",
-                        "startColumns": "4,4",
-                        "startOffsets": "89,147",
-                        "endColumns": "57,55",
-                        "endOffsets": "142,198"
-                    },
-                    "to": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,113",
-                        "endColumns": "57,55",
-                        "endOffsets": "108,164"
                     }
                 }
             ]

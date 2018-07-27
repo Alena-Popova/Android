@@ -3,6 +3,7 @@ package com.example.helenapopova.mythirdapplication.box;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.helenapopova.mythirdapplication.BuildConfig;
 import com.example.helenapopova.mythirdapplication.R;
+import com.example.helenapopova.mythirdapplication.connect.Info;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +60,7 @@ public class BoxAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class BoxAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 String textSave = editText.getText().toString();
-                if(textSave.length() != 0 && !textSave.equals(contextText)) {
+                if(!TextUtils.isEmpty(textSave) && !textSave.equals(contextText)) {
                     editor.putInt(p.getTitle(), Integer.parseInt(textSave)).apply();
                 } else if (textSave.length() == 0  && sp.contains(p.getTitle())) {
                     editor.remove(p.getTitle()).apply();
@@ -102,5 +104,19 @@ public class BoxAdapter extends BaseAdapter {
         }
     }
 
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
 
+    @Override
+    public int getViewTypeCount() {
+        return Info.getSize();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        /* calculate the view type for this row */
+        return position;
+    }
 }

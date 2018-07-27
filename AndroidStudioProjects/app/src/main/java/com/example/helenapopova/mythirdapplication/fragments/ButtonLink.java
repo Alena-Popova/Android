@@ -149,8 +149,6 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
             } catch (IOException io) {
                 outputTost("already exit");
             }
-        } else {
-            outputTost("Connection closed yet!");
         }
     }
 

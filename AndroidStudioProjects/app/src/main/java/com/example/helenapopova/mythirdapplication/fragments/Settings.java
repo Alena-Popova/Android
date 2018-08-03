@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import lombok.Data;
 
 public class Settings extends Fragment {
@@ -35,7 +38,11 @@ public class Settings extends Fragment {
     private View fragmentSettings;
     ArrayList<Mode> settings = new ArrayList<>();
     BoxAdapter boxAdapter;
+    private Unbinder unbinder;
+
+    @BindView(R.id.list_settings)
     ListView listView;
+    @BindView(R.id.settind_clean)
     Button reset;
     LayoutInflater inflaterSett;
     public static final String APP_PREFERENCES = "mysettings";
@@ -49,17 +56,28 @@ public class Settings extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflaterSett = inflater;
         fragmentSettings = inflater.inflate(R.layout.settings_fragment, container, false);
+        unbinder = ButterKnife.bind(this, fragmentSettings);
         setArrays();
         setResetButton();
         return fragmentSettings;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     public void setResetButton() {
-        reset = fragmentSettings.findViewById(R.id.settind_clean);
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +93,6 @@ public class Settings extends Fragment {
     private void setArrays() {
         fillData();
         boxAdapter = new BoxAdapter(context, this.settings);
-        listView = fragmentSettings.findViewById(R.id.list_settings);
         listView.setAdapter(boxAdapter);
 
 
@@ -86,7 +103,15 @@ public class Settings extends Fragment {
         super.onPause();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
+    /**
+     * ыстро заполняем внутренние списки значениями
+     */
     public void fillData() {
         int i;
         settings.clear();

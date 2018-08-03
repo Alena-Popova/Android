@@ -1,9 +1,9 @@
 package com.example.helenapopova.mythirdapplication.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -21,19 +21,37 @@ import com.example.helenapopova.mythirdapplication.connect.Info;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import lombok.Getter;
 
 public class ButtonLink extends Fragment implements View.OnClickListener {
 
     private FTDIconnector connectorFTDI;
+
+    @BindView(R.id.data_operation)
     EditText textViewSelectMode;
+
+    @BindView(R.id.button)
     Button buttonStart;
+    @BindView(R.id.button2)
     Button buttonStop;
+    @BindView(R.id.button_for_select_mode)
     Button buttonSelect;
+
     View inflatedView;
+    @BindView(R.id.temperature_in_data)
     TextView temperature;
+    @BindView(R.id.accepted_data)
     TextView acceptStr;
+
     SharedPreferences sp;
+    Context contextButton;
+    private Unbinder unbinder;
+
+
     @Getter
     private byte bufferFTDI[] = new byte[254];
     public static final String APP_PREFERENCES = "mysettings";
@@ -42,12 +60,21 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     public void onAttach(Context context) {
         sp = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         super.onAttach(context);
+        contextButton = context;
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflatedView = inflater.inflate(R.layout.button_link, container, false);
+        unbinder = ButterKnife.bind(this, inflatedView);
         // обработчики нажатия кнопок
         registerButtons(inflatedView);
         // контекстное меню для селекта
@@ -56,18 +83,13 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     }
 
     public void registerButtons(View context) {
-        buttonStart = (Button) context.findViewById(R.id.button);
-        buttonStop = (Button) context.findViewById(R.id.button2);
-        buttonSelect = (Button) context.findViewById(R.id.button_for_select_mode);
-        temperature = context.findViewById(R.id.temperature_in_data);
-        acceptStr = context.findViewById(R.id.accepted_data);
-        buttonStart.setOnClickListener(this);
-        buttonStop.setOnClickListener(this);
-        buttonSelect.setOnClickListener(this);
         buttonSelect.setEnabled(false);
     }
 
+
+
     @Override
+    @OnClick({R.id.button, R.id.button2, R.id.button_for_select_mode})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button:
@@ -152,15 +174,22 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
     public void outputTost(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
-//---------------- Принятие данных , все методы :
+
+    //---------------- Принятие данных , все методы :
 
     public boolean justSendMessage() {
         boolean result = false;
-        textViewSelectMode = getActivity().findViewById(R.id.data_operation);
+       // textViewSelectMode = getActivity().findViewById(R.id.data_operation);
         if (textViewSelectMode != null && textViewSelectMode.length() > 0) {
             result = onClickSend(textViewSelectMode.getText().toString());
         } else {
@@ -176,6 +205,7 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
             mask[0] = (byte) String.valueOf(offer).charAt(0);
             connectorFTDI.writeFTDI(mask, 1000);
             acceptStr.setText(getBufferToStr());
+
         } catch (IOException io) {
             outputTost("io init");
         }

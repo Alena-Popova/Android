@@ -1,4 +1,4 @@
-#Thu Jul 26 09:26:19 MSK 2018
+#Fri Aug 03 14:39:17 MSK 2018
 base.0=D\:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\transforms\\dexMerger\\debug\\0
 path.0=classes.dex
 renamed.0=classes.dex

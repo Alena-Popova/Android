@@ -1,31 +1,38 @@
 package com.example.helenapopova.mythirdapplication;
 
+import android.database.Cursor;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.helenapopova.mythirdapplication.connect.GmailLissener;
 import com.example.helenapopova.mythirdapplication.fragments.MainFragment;
 import com.example.helenapopova.mythirdapplication.fragments.Settings;
+import com.example.helenapopova.mythirdapplication.loaders.MainPageLoaderInfo;
 
 
-public class LaunchActivity extends AppCompatActivity {
+public class LaunchActivity extends AppCompatActivity{
 
     private final String TAG = "lifecicle";
     private Settings fragSettings;
     private MainFragment mainFragment;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
+    private boolean flagOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
+
         fragSettings = new Settings();
         mainFragment = new MainFragment();
         fragmentManager = getSupportFragmentManager();
@@ -35,6 +42,13 @@ public class LaunchActivity extends AppCompatActivity {
                 .addToBackStack(mainFragment.getClass().getSimpleName())
                 .commit();
 
+        if (savedInstanceState != null) {
+            flagOpen = savedInstanceState.getBoolean(MainPageLoaderInfo.FTAGMENT_SETTINFS, false);
+            if (flagOpen) {
+                outLL("must open");
+                openNeedsFragmentViwer(R.id.set_settings);
+            }
+        }
     }
 
 
@@ -74,7 +88,17 @@ public class LaunchActivity extends AppCompatActivity {
         }
     }
 
-//_______________________________________________________________________________
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int size = fragmentManager.getBackStackEntryCount();
+        boolean flag = fragmentManager.getBackStackEntryAt(size - 1).getName().equals("Settings");
+        outState.putBoolean(MainPageLoaderInfo.FTAGMENT_SETTINFS, flag);
+        outLL("save  " + String.valueOf(outState.getBoolean(MainPageLoaderInfo.FTAGMENT_SETTINFS)));
+    }
+
+
+
+    //_______________________________________________________________________________
 //-------------------------------------------------------------------------------
 
     public void outputTost(String message) {
@@ -88,17 +112,18 @@ public class LaunchActivity extends AppCompatActivity {
 
     public void openNeedsFragmentViwer(int wivwr) {
         fragmentTransaction = fragmentManager.beginTransaction();
-        int size = fragmentManager.getFragments().size();
+        int size = fragmentManager.getBackStackEntryCount();
         switch (wivwr) {
             case R.id.set_settings:
-                if (!fragmentManager.getFragments().isEmpty() && fragmentManager.getFragments().get(size - 1).getId() != fragSettings.getId()) {
+                if ( !fragmentManager.getBackStackEntryAt(size - 1).getName().equals("Settings") || flagOpen) {
                     fragmentTransaction
                             .replace(R.id.general_window, fragSettings)
                             .addToBackStack(fragSettings.getClass().getSimpleName()).commit();
+                    flagOpen = false;
                 }
                 break;
             case R.id.show_tempereture:
-                    if (fragmentManager.getBackStackEntryCount() > 0) {
+                    if (!fragmentManager.getBackStackEntryAt(size - 1).getName().equals("MainFragment")) {
                         fragmentManager.popBackStackImmediate();
                         fragmentTransaction.replace(R.id.general_window, mainFragment).commit();
                     }
@@ -111,10 +136,19 @@ public class LaunchActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (fragmentManager.getBackStackEntryCount() > 1) {
-            fragmentManager.popBackStack();
+        int size = fragmentManager.getBackStackEntryCount();
+        if (fragmentManager.getBackStackEntryAt(size - 1).getName().equals("MainFragment")) {
+            this.finish();
         } else {
             super.onBackPressed();
         }
     }
+
+    public void outLL(String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d("LoaderInfo in act", message);
+        }
+    }
+
+
 }

@@ -1,5 +1,5 @@
 #Internal package file, do not edit.
-#Thu Jul 26 09:26:19 MSK 2018
+#Mon Jul 30 15:25:32 MSK 2018
 0.baseType=DIRECTORY
 0.base=D\:\\Project Pir\\Android\\AndroidStudioProjects\\fTDI_UART_Sample\\build\\intermediates\\transforms\\dexMerger\\debug\\0
 0.path=classes.dex

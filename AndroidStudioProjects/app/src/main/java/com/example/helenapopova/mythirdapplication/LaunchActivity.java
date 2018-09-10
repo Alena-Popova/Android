@@ -1,16 +1,13 @@
 package com.example.helenapopova.mythirdapplication;
 
-import android.database.Cursor;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.helenapopova.mythirdapplication.connect.GmailLissener;
@@ -21,7 +18,7 @@ import com.example.helenapopova.mythirdapplication.loaders.MainPageLoaderInfo;
 
 public class LaunchActivity extends AppCompatActivity{
 
-    private final String TAG = "lifecicle";
+    private final String TAG = "LaunchActivity";
     private Settings fragSettings;
     private MainFragment mainFragment;
     private FragmentManager fragmentManager;
@@ -83,9 +80,7 @@ public class LaunchActivity extends AppCompatActivity{
      * @param message сообшения логгера
      */
     public void outputLogs(String message) {
-        if (BuildConfig.DEBUG) {
             Log.d(TAG, message);
-        }
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -138,6 +133,7 @@ public class LaunchActivity extends AppCompatActivity{
     public void onBackPressed() {
         int size = fragmentManager.getBackStackEntryCount();
         if (fragmentManager.getBackStackEntryAt(size - 1).getName().equals("MainFragment")) {
+            outputLogs("stop LaunchActivity");
             this.finish();
         } else {
             super.onBackPressed();
@@ -150,5 +146,8 @@ public class LaunchActivity extends AppCompatActivity{
         }
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

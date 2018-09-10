@@ -3,8 +3,10 @@ package com.example.helenapopova.mythirdapplication.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -20,6 +22,8 @@ import com.example.helenapopova.mythirdapplication.connect.FTDIconnector;
 import com.example.helenapopova.mythirdapplication.connect.Info;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +34,7 @@ import lombok.Getter;
 public class ButtonLink extends Fragment implements View.OnClickListener {
 
     private FTDIconnector connectorFTDI;
+    private final String LOG_TAG = "service ButtonLink";
 
     @BindView(R.id.data_operation)
     EditText textViewSelectMode;
@@ -47,20 +52,26 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     @BindView(R.id.accepted_data)
     TextView acceptStr;
 
-    SharedPreferences sp;
-    Context contextButton;
+    @Getter
+    private byte tempFTDI[] = new byte[2];
+    @Getter
+    private byte bufferFTDI[] = new byte[254];
+
+    private SharedPreferences sp;
     private Unbinder unbinder;
 
 
-    @Getter
-    private byte bufferFTDI[] = new byte[254];
+    private Timer myTimer = new Timer(); // Создаем таймер
+    private final Handler uiHandler = new Handler();
+    private TimerTask tt;
+
+
     public static final String APP_PREFERENCES = "mysettings";
 
     @Override
     public void onAttach(Context context) {
         sp = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         super.onAttach(context);
-        contextButton = context;
 
     }
 
@@ -79,13 +90,13 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         registerButtons(inflatedView);
         // контекстное меню для селекта
         registerForContextMenu(buttonSelect);
+        initTimerTask();
         return inflatedView;
     }
 
     public void registerButtons(View context) {
         buttonSelect.setEnabled(false);
     }
-
 
 
     @Override
@@ -99,7 +110,7 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
                 onClickStop();
                 break;
             case R.id.button_for_select_mode:
-                sendMessageAndGetAnswer();
+                runSomeTask();
                 break;
             default:
                 outputTost("Error #2");
@@ -109,12 +120,11 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        String change;
 
         for (int i = 0; i < 7; i++) {
             char id = Info.getOperationsMode()[i];
             if (sp.contains(Info.getTitlesMode()[i])) {
-                id = (char) (sp.getInt(Info.getTitlesMode()[i],i + 40) + 24);
+                id = (char) (sp.getInt(Info.getTitlesMode()[i], i + 40) + 24);
             }
             int code = Integer.valueOf(id) - 24;
             menu.add(0, id, i + 1, Info.getTitlesMode()[i] + "0x" + code);
@@ -124,20 +134,29 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         TextView textView = inflatedView.findViewById(R.id.mode_data);
-        onClickSend(Character.toString((char) item.getItemId()));
-        int code = item.getItemId() - 24;
-        textView.setText(Info.getTitlesMode()[item.getOrder()] + "0x" + code);
+        if (onClickSend(Character.toString((char) item.getItemId()))) {
+            int code = item.getItemId() - 24;
+            textView.setText(Info.getTitlesMode()[item.getOrder()] + "0x" + code);
+        } else {
+            outputTost("no transaction");
+            outputTost("check Devices");
+        }
         return true;
     }
 
+    /**
+     * Инициализируем драйвер, включаем работу сервиса
+     */
     public void onClickStart() {
         connectorFTDI = new FTDIconnector(getActivity());
         try {
             connectorFTDI.init();
         } catch (IOException io) {
-            outputTost("io init");
+            outputLogs("onClickStart crash");
         }
-        buttonSelect.setEnabled(true);
+        if (connectorFTDI != null) {
+            buttonSelect.setEnabled(true);
+        }
     }
 
     @Override
@@ -147,13 +166,13 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     }
 
     public boolean onClickSend(String operation) {
+        onDestroyTimer();
         boolean result = false;
         if (connectorFTDI != null && operation != null && operation.length() != 0) {
             try {
                 byte[] mask = new byte[1];
                 mask[0] = (byte) operation.charAt(0);
-                connectorFTDI.writeFTDI(mask, 1000);
-                result = true;
+                result = connectorFTDI.writeFTDI(mask, 1000);
             } catch (IOException io) {
                 outputTost("io init");
             }
@@ -163,14 +182,21 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         return result;
     }
 
+    /**
+     * отключаем работу сервиса и драйвера
+     */
     public void onClickStop() {
+        onDestroyTimer();
         if (connectorFTDI != null) {
             try {
                 connectorFTDI.close();
+                connectorFTDI = null;
                 buttonSelect.setEnabled(false);
             } catch (IOException io) {
                 outputTost("already exit");
             }
+        } else {
+            outputLogs("onClickStop : connectorFTDI == null");
         }
     }
 
@@ -189,7 +215,6 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
 
     public boolean justSendMessage() {
         boolean result = false;
-       // textViewSelectMode = getActivity().findViewById(R.id.data_operation);
         if (textViewSelectMode != null && textViewSelectMode.length() > 0) {
             result = onClickSend(textViewSelectMode.getText().toString());
         } else {
@@ -216,15 +241,74 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         StringBuilder result = new StringBuilder();
         result.append(" ");
         try {
-            answer = connectorFTDI.readFTDI(bufferFTDI, 30);
+            if (connectorFTDI != null) {
+                answer = connectorFTDI.readFTDI(bufferFTDI, 30);
+                if (answer == 0) {
+                    outputTost("no transaction");
+                    outputTost("check Devices");
+                } else {
+                    if (bufferFTDI.length > 0) {
+                        for (int i = 0; i < answer; i++) {
+                            if (i == 2 || i == 3) {
+                                this.tempFTDI[i - 2] = bufferFTDI[i];
+                            }
+                            result.append(String.format("%02X", bufferFTDI[i])).append(" ");
+
+                        }
+                    }
+                }
+            }
         } catch (IOException io) {
             outputTost("io init");
         }
-        for (int i = 0; i < answer; i++) {
-            result.append(String.format("%02X", bufferFTDI[i])).append(" ");
-        }
         bufferFTDI = new byte[254];
         return result.toString();
+    }
+
+    /**
+     * Снимает значения температуры ,
+     * отправляет на экран
+     */
+    private void runSomeTask() {
+        myTimer.schedule(tt, 0L, 1000);
+
+    }
+
+    /**
+     * гасит таймер
+     */
+    public void onDestroyTimer() {
+        tt.cancel();
+        myTimer.purge();
+        outputLogs("onDestroy timer");
+    }
+
+    public void outputLogs(String message) {
+        Log.i(LOG_TAG, message);
+    }
+
+
+    /**
+     * то,что будет делать такска
+     */
+    private void initTimerTask() {
+        tt = new TimerTask() {
+            @Override
+            public void run() {
+                uiHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        sendMessageAndGetAnswer();
+                        StringBuilder result = new StringBuilder();
+                        for (byte i : tempFTDI) {
+                            result.append(String.format("%02X", tempFTDI[i]));
+                        }
+                        /*if (result != null)
+                            temperature.setText(String.format("%d C", Integer.parseInt(result.toString(), 16)));*/
+                    }
+                });
+            }
+        };
     }
 
 }

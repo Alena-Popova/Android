@@ -24,6 +24,7 @@
                 android:resource="@xml/device_filter" />
 
         </activity>
+
     </application>
 
 </manifest>

@@ -52,11 +52,25 @@ public class FTDIconnector {
     }
 
     public int readFTDI(byte[] dest, int timeoutMillis) throws IOException {
-        return usbSerialPort.read(dest, timeoutMillis);
+        if (usbSerialPort != null)
+            return usbSerialPort.read(dest, timeoutMillis);
+        else {
+            return 0;
+        }
+
     }
 
-    public void writeFTDI(byte[] operation, int timeoutMillis) throws IOException {
-        usbSerialPort.write(operation, timeoutMillis);
+    public boolean writeFTDI(byte[] operation, int timeoutMillis) throws IOException {
+        boolean result = false;
+        try {
+            if (usbSerialPort != null) {
+                usbSerialPort.write(operation, timeoutMillis);
+                result = true;
+            }
+        } catch (IOException e) {
+           outputTost("no transaction");
+        }
+        return result;
     }
 
 

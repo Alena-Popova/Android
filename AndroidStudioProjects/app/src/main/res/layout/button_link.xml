@@ -97,7 +97,6 @@
         android:id="@+id/insert_data_operation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2"
         app:layout_constraintTop_toBottomOf="@id/buttons_pair_first"
         android:orientation="horizontal">
 
@@ -107,13 +106,6 @@
             android:layout_height="wrap_content"
             android:text="@string/buttom_select_mode_FA"
             android:layout_marginLeft="10dp"/>
-
-        <EditText
-            android:id="@+id/data_operation"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="code operation"
-            android:textSize="15dp"/>
 
     </LinearLayout>
 

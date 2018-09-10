@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 
 import com.example.helenapopova.mythirdapplication.R;
 
+/**
+ * собирает в себе фрагменты от ButtonLink и Introduction
+ */
 public class MainFragment extends Fragment {
 
     @Override

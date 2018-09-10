@@ -36,9 +36,6 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     private FTDIconnector connectorFTDI;
     private final String LOG_TAG = "service ButtonLink";
 
-    @BindView(R.id.data_operation)
-    EditText textViewSelectMode;
-
     @BindView(R.id.button)
     Button buttonStart;
     @BindView(R.id.button2)
@@ -165,6 +162,11 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         super.onPause();
     }
 
+    /**
+     * метод для контекстного моню с отправкой кода моды работы
+     * @param operation
+     * @return
+     */
     public boolean onClickSend(String operation) {
         onDestroyTimer();
         boolean result = false;
@@ -213,16 +215,10 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
 
     //---------------- Принятие данных , все методы :
 
-    public boolean justSendMessage() {
-        boolean result = false;
-        if (textViewSelectMode != null && textViewSelectMode.length() > 0) {
-            result = onClickSend(textViewSelectMode.getText().toString());
-        } else {
-            outputTost("Enter text, please!");
-        }
-        return result;
-    }
 
+    /**
+     * Отправляем окд операции , получаем ответ от устройства в getBufferToStr()
+     */
     public void sendMessageAndGetAnswer() {
         try {
             byte[] mask = new byte[1];
@@ -236,6 +232,11 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * читаем ответ устройства , записываем все в result,
+     * байты температуры записываем в tempFTDI
+     * @return result
+     */
     public String getBufferToStr() {
         int answer = 0;
         StringBuilder result = new StringBuilder();
@@ -268,6 +269,7 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
     /**
      * Снимает значения температуры ,
      * отправляет на экран
+     * раз в 1 секкунду (1000 млсек)
      */
     private void runSomeTask() {
         myTimer.schedule(tt, 0L, 1000);
@@ -300,11 +302,12 @@ public class ButtonLink extends Fragment implements View.OnClickListener {
                     public void run() {
                         sendMessageAndGetAnswer();
                         StringBuilder result = new StringBuilder();
-                        for (byte i : tempFTDI) {
-                            result.append(String.format("%02X", tempFTDI[i]));
-                        }
-                        /*if (result != null)
-                            temperature.setText(String.format("%d C", Integer.parseInt(result.toString(), 16)));*/
+                        result.append(String.format("%02X", tempFTDI[0]));
+                        result.append(String.format("%02X", tempFTDI[1]));
+                        tempFTDI = new byte[2];
+                        if (result != null)
+                            temperature.setText(String.format("%d °C",Integer.parseInt(result.toString(),16)));
+
                     }
                 });
             }

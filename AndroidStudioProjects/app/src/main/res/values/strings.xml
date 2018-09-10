@@ -18,7 +18,7 @@
     <string name="buttom_firsr_FA">Contact the device!</string>
     <string name="buttom_second_FA">Update link!</string>
     <string name="buttom_stop_link_FA">Stop Link!</string>
-    <string name="buttom_select_mode_FA">Select mode!</string>
+    <string name="buttom_select_mode_FA">Send mode!</string>
     <string name="instructions_titile">Instructions for communicating with the device:</string>
     <string name="temperature">No connection</string>
     <string name="preview_mode_link">Mode link: </string>

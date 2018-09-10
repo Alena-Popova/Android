@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 
 import com.example.helenapopova.mythirdapplication.R;
 
+/**
+ * введение отображает.
+ * Чисто текстовый фрагмент
+ */
 public class Introduction extends Fragment {
 
     @Override

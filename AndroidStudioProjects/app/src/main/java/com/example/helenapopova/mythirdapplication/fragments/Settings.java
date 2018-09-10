@@ -33,6 +33,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import lombok.Data;
 
+/**
+ * фрагмент для скрина с начтройками
+ */
 public class Settings extends Fragment {
     private Context context;
     private View fragmentSettings;
@@ -61,6 +64,13 @@ public class Settings extends Fragment {
         setRetainInstance(true);
     }
 
+    /**
+     * дгружает настройки из файла setArrays с помощью ресурсов getSharedPreferences и инициализирует кнопку
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -77,6 +87,9 @@ public class Settings extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
+    /**
+     * очищает наш файл с хранимыми настройками
+     */
     public void setResetButton() {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
